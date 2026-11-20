@@ -40,21 +40,31 @@ val qwenCustomTabsPatch = patch(
         }
         require(downloadCheck >= 0) { "Could not locate Qwen's download navigation check." }
 
-        // Hook immediately after Qwen loads navigationUrlTransformer. Later in
-        // the method it reuses p2 for a Boolean result, so it must still be a request.
-        val transformerLoadIndex = instructions.indexOfLast { instruction ->
+        // Qwen short-circuits handled navigations immediately after calling
+        // onNavigationRequest. Intercept that branch before it returns to Qwen's
+        // internal browser; later in the method p2 is reused as a Boolean.
+        val navigationHandlerIndex = instructions.indexOfLast { instruction ->
             instruction.opcode == Opcode.IGET_OBJECT &&
                 ((instruction as? ReferenceInstruction)?.reference as? FieldReference)?.name ==
-                "navigationUrlTransformer"
+                "onNavigationRequest"
         }
-        require(transformerLoadIndex > downloadCheck) {
-            "Could not locate Qwen's navigation URL transformer."
+        require(navigationHandlerIndex in 0 until downloadCheck) {
+            "Could not locate Qwen's navigation handler."
         }
+        val handledNavigationBranch = (navigationHandlerIndex + 1 until downloadCheck).firstOrNull { index ->
+            val instruction = instructions[index]
+            val previous = instructions[index - 1]
+            (instruction.opcode == Opcode.GOTO ||
+                instruction.opcode == Opcode.GOTO_16 ||
+                instruction.opcode == Opcode.GOTO_32) &&
+            previous.opcode == Opcode.IF_EQZ
+        } ?: error("Could not locate Qwen's handled-navigation branch.")
+        val continuationInstruction = instructions[handledNavigationBranch]
 
         val implementation = method.implementation!!
         // Qwen 2.5.1 has ten local registers (v0-v9) and three incoming
-        // registers (p0-p2 = v10-v12). These local registers are no longer
-        // needed after the transformer load.
+        // registers (p0-p2 = v10-v12). This branch returns immediately after
+        // the original goto, so these scratch locals are safe to reuse.
         require(implementation.registerCount >= 13) {
             "Unexpected register layout in Qwen's WebView navigation method."
         }
@@ -64,14 +74,25 @@ val qwenCustomTabsPatch = patch(
         val freeTabs = 8
 
         method.addInstructionsWithLabels(
-            transformerLoadIndex + 1,
+            handledNavigationBranch,
             """
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
                 move-result v$freeGesture
                 if-eqz v$freeGesture, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
                 move-result-object v$freeUri
-                invoke-virtual { v4 }, Landroid/view/View;->getContext()Landroid/content/Context;
+                invoke-virtual { v$freeUri }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+                move-result-object v$freeContext
+                if-eqz v$freeContext, :qwen_custom_tabs_continue
+                const-string v$freeTabs, "http"
+                invoke-virtual { v$freeContext, v$freeTabs }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v$freeTabs
+                const-string v9, "https"
+                invoke-virtual { v$freeContext, v9 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v9
+                or-int/2addr v$freeTabs, v9
+                if-eqz v$freeTabs, :qwen_custom_tabs_continue
+                invoke-virtual { p1 }, Landroid/view/View;->getContext()Landroid/content/Context;
                 move-result-object v$freeContext
                 new-instance v$freeTabs, $CUSTOM_TABS_BUILDER
                 invoke-direct { v$freeTabs }, $CUSTOM_TABS_BUILDER-><init>()V
@@ -81,7 +102,7 @@ val qwenCustomTabsPatch = patch(
                 const/4 v$freeGesture, 0x1
                 return v$freeGesture
             """,
-            ExternalLabel("qwen_custom_tabs_continue", instructions[transformerLoadIndex + 1])
+            ExternalLabel("qwen_custom_tabs_continue", continuationInstruction)
         )
     }
 }
