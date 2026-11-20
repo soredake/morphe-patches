@@ -1,8 +1,7 @@
 package app.soredake.patches.qwen
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.util.getFreeRegisterProvider
 import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
@@ -55,9 +54,7 @@ val qwenCustomTabsPatch = patch(
         val freeUri = registers.getFreeRegister4Bit()
         val freeTabs = registers.getFreeRegister4Bit()
 
-        method.removeInstruction(falseConstantIndex)
-        method.addInstruction(falseConstantIndex, "const/4 v$returnRegister, 0x1")
-        method.addInstructions(
+        method.addInstructionsAtControlFlowLabel(
             falseConstantIndex,
             """
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
@@ -69,6 +66,8 @@ val qwenCustomTabsPatch = patch(
                 invoke-virtual { v$freeTabs }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
                 move-result-object v$freeTabs
                 invoke-virtual { v$freeTabs, v$freeContext, v$freeUri }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                const/4 v$returnRegister, 0x1
+                return v$returnRegister
             """
         )
     }
