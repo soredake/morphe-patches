@@ -8,6 +8,8 @@ import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 private const val CUSTOM_TABS_INTENT = "Landroidx/browser/customtabs/CustomTabsIntent;"
 private const val CUSTOM_TABS_BUILDER = "Landroidx/browser/customtabs/CustomTabsIntent\$Builder;"
@@ -31,9 +33,11 @@ val qwenCustomTabsPatch = patch(
     execute {
         val method = QwenWebNavigationFingerprint.method
         val instructions = method.implementation!!.instructions
-        val downloadCheck = instructions.indexOfLast {
-            (it.opcode == Opcode.CONST_STRING || it.opcode == Opcode.CONST_STRING_JUMBO) &&
-                it.toString().contains("\"download=true\"")
+        val downloadCheck = instructions.indexOfLast { instruction ->
+            (instruction.opcode == Opcode.CONST_STRING ||
+                instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
+                ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string ==
+                "download=true"
         }
         require(downloadCheck >= 0) { "Could not locate Qwen's download navigation check." }
 
