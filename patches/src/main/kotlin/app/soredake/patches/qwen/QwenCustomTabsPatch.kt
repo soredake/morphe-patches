@@ -1,8 +1,9 @@
 package app.soredake.patches.qwen
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.patch
+import app.morphe.patcher.util.smali.ExternalLabel
 import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -62,7 +63,7 @@ val qwenCustomTabsPatch = patch(
         val freeContext = 7
         val freeTabs = 8
 
-        method.addInstructions(
+        method.addInstructionsWithLabels(
             transformerLoadIndex + 1,
             """
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
@@ -70,7 +71,7 @@ val qwenCustomTabsPatch = patch(
                 if-eqz v$freeGesture, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
                 move-result-object v$freeUri
-                invoke-virtual { p1 }, Landroid/view/View;->getContext()Landroid/content/Context;
+                invoke-virtual { v4 }, Landroid/view/View;->getContext()Landroid/content/Context;
                 move-result-object v$freeContext
                 new-instance v$freeTabs, $CUSTOM_TABS_BUILDER
                 invoke-direct { v$freeTabs }, $CUSTOM_TABS_BUILDER-><init>()V
@@ -79,8 +80,8 @@ val qwenCustomTabsPatch = patch(
                 invoke-virtual { v$freeTabs, v$freeContext, v$freeUri }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
                 const/4 v$freeGesture, 0x1
                 return v$freeGesture
-                :qwen_custom_tabs_continue
-            """
+            """,
+            ExternalLabel("qwen_custom_tabs_continue", instructions[transformerLoadIndex + 1])
         )
     }
 }
