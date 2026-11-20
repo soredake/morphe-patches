@@ -1,3 +1,9 @@
+## [1.0.0-dev.15](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* open chat response links in custom tabs ([cc87c92](https://github.com/soredake/morphe-patches/commit/cc87c92eacb552c578eb98c2acacb00cc3ab8d9e))
+
 ## [1.0.0-dev.14](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2026-11-20)
 
 ### 🐛 Bug Fixes
