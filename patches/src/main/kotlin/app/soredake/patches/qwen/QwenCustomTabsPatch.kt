@@ -8,6 +8,7 @@ import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 private const val CUSTOM_TABS_INTENT = "Landroidx/browser/customtabs/CustomTabsIntent;"
@@ -19,6 +20,14 @@ private object QwenWebNavigationFingerprint : Fingerprint(
     returnType = "Z",
     parameters = listOf("Landroid/webkit/WebView;", "Landroid/webkit/WebResourceRequest;"),
     strings = listOf("download=true", "oauth/google/login")
+)
+
+private object QwenPopupNavigationFingerprint : Fingerprint(
+    definingClass = "Lai/qwenlm/chat/android/ui/web/WebScreenKt\$openPopupInComposeWeb\$1;",
+    name = "handleUrl",
+    returnType = "Z",
+    parameters = listOf("Landroid/webkit/WebView;", "Ljava/lang/String;"),
+    strings = listOf("about:blank")
 )
 
 @Suppress("unused")
@@ -100,6 +109,64 @@ val qwenCustomTabsPatch = patch(
                 return v$freeResult
             """,
             ExternalLabel("qwen_custom_tabs_continue", continuationInstruction)
+        )
+
+        // Links opened with window.open are routed through this popup handler,
+        // which otherwise sends HTTP(S) destinations to QwenWebViewActivity.
+        val popupMethod = QwenPopupNavigationFingerprint.method
+        val popupInstructions = popupMethod.implementation!!.instructions
+        val uriClassifierIndex = popupInstructions.indexOfFirst { instruction ->
+            instruction.opcode == Opcode.INVOKE_STATIC &&
+                ((instruction as? ReferenceInstruction)?.reference as? MethodReference)?.let { reference ->
+                    reference.definingClass == "Lai/qwenlm/chat/android/clean/utils/WebExtKt;" &&
+                        reference.name == "g"
+                } == true
+        }
+        require(uriClassifierIndex >= 0) {
+            "Could not locate Qwen's popup URL routing check."
+        }
+        val cleanupIndex = popupInstructions.indexOfFirst { instruction ->
+            instruction.opcode == Opcode.INVOKE_VIRTUAL &&
+                ((instruction as? ReferenceInstruction)?.reference as? MethodReference)?.let { reference ->
+                    reference.definingClass == "Landroid/webkit/WebView;" &&
+                        reference.name == "stopLoading"
+                } == true
+        }
+        require(cleanupIndex > uriClassifierIndex) {
+            "Could not locate Qwen's popup WebView cleanup path."
+        }
+        require(popupMethod.implementation!!.registerCount >= 7) {
+            "Unexpected register layout in Qwen's popup navigation method."
+        }
+
+        popupMethod.addInstructionsWithLabels(
+            uriClassifierIndex,
+            """
+                invoke-static { p2 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+                move-result-object v0
+                invoke-virtual { v0 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+                move-result-object v2
+                if-eqz v2, :qwen_popup_continue
+                const-string v3, "http"
+                invoke-virtual { v2, v3 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v3
+                const-string v0, "https"
+                invoke-virtual { v2, v0 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v0
+                or-int/2addr v3, v0
+                if-eqz v3, :qwen_popup_continue
+                invoke-static { p2 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+                move-result-object v0
+                iget-object v2, p0, Lai/qwenlm/chat/android/ui/web/WebScreenKt\$openPopupInComposeWeb\$1;->\$context:Landroid/content/Context;
+                new-instance v3, $CUSTOM_TABS_BUILDER
+                invoke-direct { v3 }, $CUSTOM_TABS_BUILDER-><init>()V
+                invoke-virtual { v3 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
+                move-result-object v3
+                invoke-virtual { v3, v2, v0 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                goto :qwen_popup_cleanup
+            """,
+            ExternalLabel("qwen_popup_continue", popupInstructions[uriClassifierIndex]),
+            ExternalLabel("qwen_popup_cleanup", popupInstructions[cleanupIndex])
         )
     }
 }
