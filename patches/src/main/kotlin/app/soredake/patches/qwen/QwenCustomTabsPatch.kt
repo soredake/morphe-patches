@@ -61,6 +61,9 @@ val qwenCustomTabsPatch = patch(
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
                 move-result v$freeContext
                 if-eqz v$freeContext, :qwen_custom_tabs_continue
+                invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
+                move-result v$freeContext
+                if-eqz v$freeContext, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
                 move-result-object v$freeUri
                 invoke-virtual { p1 }, Landroid/view/View;->getContext()Landroid/content/Context;
