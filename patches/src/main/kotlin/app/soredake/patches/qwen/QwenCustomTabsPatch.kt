@@ -68,7 +68,7 @@ val qwenCustomTabsPatch = patch(
         require(implementation.registerCount >= 13) {
             "Unexpected register layout in Qwen's WebView navigation method."
         }
-        val freeGesture = 5
+        val freeResult = 5
         val freeUri = 6
         val freeContext = 7
         val freeTabs = 8
@@ -76,9 +76,6 @@ val qwenCustomTabsPatch = patch(
         method.addInstructionsWithLabels(
             handledNavigationBranch,
             """
-                invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
-                move-result v$freeGesture
-                if-eqz v$freeGesture, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
                 move-result-object v$freeUri
                 invoke-virtual { v$freeUri }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
@@ -99,8 +96,8 @@ val qwenCustomTabsPatch = patch(
                 invoke-virtual { v$freeTabs }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
                 move-result-object v$freeTabs
                 invoke-virtual { v$freeTabs, v$freeContext, v$freeUri }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
-                const/4 v$freeGesture, 0x1
-                return v$freeGesture
+                const/4 v$freeResult, 0x1
+                return v$freeResult
             """,
             ExternalLabel("qwen_custom_tabs_continue", continuationInstruction)
         )
