@@ -39,8 +39,8 @@ val qwenCustomTabsPatch = patch(
         }
         require(downloadCheck >= 0) { "Could not locate Qwen's download navigation check." }
 
-        // Hook before Qwen loads navigationUrlTransformer. Later in the method
-        // it reuses p2 for a Boolean result, so p2 is no longer a request there.
+        // Hook immediately after Qwen loads navigationUrlTransformer. Later in
+        // the method it reuses p2 for a Boolean result, so it must still be a request.
         val transformerLoadIndex = instructions.indexOfLast { instruction ->
             instruction.opcode == Opcode.IGET_OBJECT &&
                 ((instruction as? ReferenceInstruction)?.reference as? FieldReference)?.name ==
@@ -63,7 +63,7 @@ val qwenCustomTabsPatch = patch(
         val freeTabs = 8
 
         method.addInstructions(
-            transformerLoadIndex,
+            transformerLoadIndex + 1,
             """
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
                 move-result v$freeGesture
