@@ -1,3 +1,9 @@
+## [1.0.0-dev.11](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.10...v1.0.0-dev.11) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* intercept Qwen handled link navigations ([674cb34](https://github.com/soredake/morphe-patches/commit/674cb34909e739be5895bee64dd0707fbfcd9a2d))
+
 ## [1.0.0-dev.10](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.9...v1.0.0-dev.10) (2026-11-20)
 
 ### 🐛 Bug Fixes
