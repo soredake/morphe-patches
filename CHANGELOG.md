@@ -1,3 +1,9 @@
+## [1.0.0-dev.8](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.7...v1.0.0-dev.8) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* inject before Qwen reuses request register ([12093b1](https://github.com/soredake/morphe-patches/commit/12093b13132a5c842d6eee12717c413713a65e92))
+
 ## [1.0.0-dev.7](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2026-11-20)
 
 ### 🐛 Bug Fixes
