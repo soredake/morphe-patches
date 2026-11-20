@@ -1,3 +1,9 @@
+## [1.0.0-dev.5](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* keep Qwen method parameters out of temp registers ([dd8eaab](https://github.com/soredake/morphe-patches/commit/dd8eaab0d7d021c7a4a1b8812b1198695b5be45d))
+
 ## [1.0.0-dev.4](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-11-20)
 
 ### 🐛 Bug Fixes
