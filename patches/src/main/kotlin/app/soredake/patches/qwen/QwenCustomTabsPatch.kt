@@ -1,7 +1,7 @@
 package app.soredake.patches.qwen
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsAtControlFlowLabel
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.util.getFreeRegisterProvider
 import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
@@ -54,7 +54,7 @@ val qwenCustomTabsPatch = patch(
         val freeUri = registers.getFreeRegister4Bit()
         val freeTabs = registers.getFreeRegister4Bit()
 
-        method.addInstructionsAtControlFlowLabel(
+        method.addInstructions(
             falseConstantIndex,
             """
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
