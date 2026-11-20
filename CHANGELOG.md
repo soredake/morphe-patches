@@ -1,3 +1,9 @@
+## [1.0.0-dev.16](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.15...v1.0.0-dev.16) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* route Compose chat links to custom tabs ([e4b0091](https://github.com/soredake/morphe-patches/commit/e4b0091cc46782307d1f26b23123a23b59ffb90b))
+
 ## [1.0.0-dev.15](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2026-11-20)
 
 ### 🐛 Bug Fixes
