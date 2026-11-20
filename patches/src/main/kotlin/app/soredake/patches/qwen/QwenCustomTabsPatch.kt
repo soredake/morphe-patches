@@ -32,6 +32,14 @@ private object QwenPopupNavigationFingerprint : Fingerprint(
     strings = listOf("about:blank")
 )
 
+private object QwenWebViewActivityFingerprint : Fingerprint(
+    definingClass = "Lcom/aliyun/tongyi/browser/QwenWebViewActivity;",
+    name = "onCreate",
+    returnType = "V",
+    parameters = listOf("Landroid/os/Bundle;"),
+    strings = listOf("targetUrl")
+)
+
 @Suppress("unused")
 val qwenCustomTabsPatch = patch(
     name = "Open links in Custom Tabs",
@@ -169,6 +177,57 @@ val qwenCustomTabsPatch = patch(
             """,
             ExternalLabel("qwen_popup_continue", popupInstructions[uriClassifierIndex]),
             ExternalLabel("qwen_popup_cleanup", popupInstructions[cleanupIndex])
+        )
+
+        // Some chat-link routes launch QwenWebViewActivity directly with a
+        // targetUrl extra, bypassing both WebViewClient interception points.
+        val activityMethod = QwenWebViewActivityFingerprint.method
+        val activityInstructions = activityMethod.implementation!!.instructions
+        val targetUrlIndex = activityInstructions.indexOfFirst { instruction ->
+            (instruction.opcode == Opcode.CONST_STRING ||
+                instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
+                ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string == "targetUrl"
+        }
+        require(targetUrlIndex >= 0) {
+            "Could not locate QwenWebViewActivity's target URL extra."
+        }
+        val targetUrlResultIndex = (targetUrlIndex + 1 until activityInstructions.size).firstOrNull { index ->
+            activityInstructions[index].opcode == Opcode.MOVE_RESULT_OBJECT
+        } ?: error("Could not locate QwenWebViewActivity's target URL result.")
+        val activityContinuationIndex = targetUrlResultIndex + 1
+        require(activityContinuationIndex < activityInstructions.size) {
+            "Could not locate QwenWebViewActivity's target URL continuation."
+        }
+        require(activityMethod.implementation!!.registerCount >= 16) {
+            "Unexpected register layout in QwenWebViewActivity.onCreate."
+        }
+
+        activityMethod.addInstructionsWithLabels(
+            activityContinuationIndex,
+            """
+                if-eqz p1, :qwen_activity_continue
+                invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+                move-result-object v0
+                invoke-virtual { v0 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+                move-result-object v1
+                if-eqz v1, :qwen_activity_continue
+                const-string v2, "http"
+                invoke-virtual { v1, v2 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v2
+                const-string v3, "https"
+                invoke-virtual { v1, v3 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v3
+                or-int/2addr v2, v3
+                if-eqz v2, :qwen_activity_continue
+                new-instance v4, $CUSTOM_TABS_BUILDER
+                invoke-direct { v4 }, $CUSTOM_TABS_BUILDER-><init>()V
+                invoke-virtual { v4 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
+                move-result-object v4
+                invoke-virtual { v4, p0, v0 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                invoke-virtual { p0 }, Landroid/app/Activity;->finish()V
+                return-void
+            """,
+            ExternalLabel("qwen_activity_continue", activityInstructions[activityContinuationIndex])
         )
     }
 }
