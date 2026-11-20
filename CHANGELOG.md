@@ -1,3 +1,9 @@
+## [1.0.0-dev.2](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* find navigation string from dex reference ([4c2a486](https://github.com/soredake/morphe-patches/commit/4c2a486ce14d39b4530846de542c907a968b80f9))
+
 ## 1.0.0-dev.1 (2026-11-20)
 
 ### ✨ New Features

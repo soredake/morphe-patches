@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-20T18:50:09",
-  "description": "## 1.0.0-dev.1 (2026-11-20)\n\n### ✨ New Features\n\n* add Qwen custom tabs patch ([26bf91e](https://github.com/soredake/morphe-patches/commit/26bf91e152e249f534c3ebeda5dd89ef680a6d12))\n\n### 🐛 Bug Fixes\n\n* return after launching custom tab ([d67f131](https://github.com/soredake/morphe-patches/commit/d67f1317768c4b6dbe26190085beedd19e5769dc))\n* use available instruction insertion API ([71a1fba](https://github.com/soredake/morphe-patches/commit/71a1fba9914f638b9bbe493d8fa0fbef5faa4891))\n* use supported instruction mutation API ([3db8dc7](https://github.com/soredake/morphe-patches/commit/3db8dc7890b4214c85aec30076c35bbbb7b8cd73))",
-  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.1/patches-1.0.0-dev.1.mpp",
+  "created_at": "2026-11-20T18:56:03",
+  "description": "## [1.0.0-dev.2](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-11-20)\n\n### 🐛 Bug Fixes\n\n* find navigation string from dex reference ([4c2a486](https://github.com/soredake/morphe-patches/commit/4c2a486ce14d39b4530846de542c907a968b80f9))",
+  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.2/patches-1.0.0-dev.2.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.1"
+  "version": "1.0.0-dev.2"
 }
