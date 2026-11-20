@@ -1,3 +1,9 @@
+## [1.0.0-dev.7](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* use explicit Qwen local registers ([19e3450](https://github.com/soredake/morphe-patches/commit/19e3450a3251c0b1d50db6cba04bf95d7a8d2f51))
+
 ## [1.0.0-dev.6](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2026-11-20)
 
 ### 🐛 Bug Fixes
