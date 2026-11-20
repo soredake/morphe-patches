@@ -51,7 +51,9 @@ val qwenCustomTabsPatch = patch(
 
         val returnRegister = (instructions[returnIndex] as OneRegisterInstruction).registerA
         val implementation = method.implementation!!
-        val parameterStart = implementation.registerCount - method.parameterTypes.size - 1
+        // This is an instance method with p0=this, p1=WebView, and p2=request.
+        // Exclude the three physical incoming registers from temporary allocation.
+        val parameterStart = implementation.registerCount - 3
         val registers = method.getFreeRegisterProvider(
             returnIndex,
             3,
