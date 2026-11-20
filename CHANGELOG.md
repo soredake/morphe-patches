@@ -1,3 +1,9 @@
+## [1.0.0-dev.9](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.8...v1.0.0-dev.9) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* preserve Qwen branch target during injection ([62ec6db](https://github.com/soredake/morphe-patches/commit/62ec6dbca2e816360bfc2cf2ea783d51d26d49ce))
+
 ## [1.0.0-dev.8](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.7...v1.0.0-dev.8) (2026-11-20)
 
 ### 🐛 Bug Fixes
