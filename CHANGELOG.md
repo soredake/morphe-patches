@@ -1,3 +1,9 @@
+## [1.0.0-dev.12](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.11...v1.0.0-dev.12) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* bypass Qwen browser for handled web links ([89091b6](https://github.com/soredake/morphe-patches/commit/89091b692341fe7235206db8c73775805c2b141e))
+
 ## [1.0.0-dev.11](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.10...v1.0.0-dev.11) (2026-11-20)
 
 ### 🐛 Bug Fixes
