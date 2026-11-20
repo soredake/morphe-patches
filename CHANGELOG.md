@@ -1,3 +1,9 @@
+## [1.0.0-dev.10](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.9...v1.0.0-dev.10) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* bind injected branch to Qwen continuation ([fb08b88](https://github.com/soredake/morphe-patches/commit/fb08b88c887b2b780254a9b965504c1c93f17923))
+
 ## [1.0.0-dev.9](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.8...v1.0.0-dev.9) (2026-11-20)
 
 ### 🐛 Bug Fixes
