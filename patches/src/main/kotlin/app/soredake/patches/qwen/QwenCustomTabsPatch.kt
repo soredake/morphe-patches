@@ -157,7 +157,7 @@ val qwenCustomTabsPatch = patch(
                 if-eqz v3, :qwen_popup_continue
                 invoke-static { p2 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
                 move-result-object v0
-                iget-object v2, p0, Lai/qwenlm/chat/android/ui/web/WebScreenKt\$openPopupInComposeWeb\$1;->\$context:Landroid/content/Context;
+                iget-object v2, p0, Lai/qwenlm/chat/android/ui/web/WebScreenKt${'$'}openPopupInComposeWeb${'$'}1;->${'$'}context:Landroid/content/Context;
                 new-instance v3, $CUSTOM_TABS_BUILDER
                 invoke-direct { v3 }, $CUSTOM_TABS_BUILDER-><init>()V
                 invoke-virtual { v3 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
