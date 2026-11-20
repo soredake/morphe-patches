@@ -41,11 +41,11 @@ private object QwenWebViewActivityFingerprint : Fingerprint(
     strings = listOf("targetUrl")
 )
 
-private object QwenChatResponseLinkFingerprint : Fingerprint(
-    definingClass = "Lai/qwenlm/chat/android/clean/navigation/graph/m2;",
-    name = "invoke",
-    returnType = "Ljava/lang/Object;",
-    parameters = listOf("Ljava/lang/Object;"),
+private object ComposeUriHandlerFingerprint : Fingerprint(
+    definingClass = "Landroidx/compose/ui/platform/AndroidUriHandler;",
+    name = "openUri",
+    returnType = "V",
+    parameters = listOf("Ljava/lang/String;"),
     strings = listOf("android.intent.action.VIEW")
 )
 
@@ -239,39 +239,56 @@ val qwenCustomTabsPatch = patch(
             ExternalLabel("qwen_activity_continue", activityInstructions[activityContinuationIndex])
         )
 
-        // Chat response links use this callback to send ACTION_VIEW intents,
-        // which Qwen resolves to its own in-app browser.
-        val responseLinkMethod = QwenChatResponseLinkFingerprint.method
-        val responseLinkInstructions = responseLinkMethod.implementation!!.instructions
-        val actionViewIndex = responseLinkInstructions.indexOfFirst { instruction ->
+        // Compose text links use AndroidUriHandler, whose ACTION_VIEW intent
+        // resolves to Qwen's in-app browser. Route HTTP(S) through Custom Tabs;
+        // preserve normal ACTION_VIEW behavior for other URI schemes.
+        val composeUriMethod = ComposeUriHandlerFingerprint.method
+        val composeUriInstructions = composeUriMethod.implementation!!.instructions
+        val actionViewIndex = composeUriInstructions.indexOfFirst { instruction ->
             (instruction.opcode == Opcode.CONST_STRING ||
                 instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
                 ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string ==
                 "android.intent.action.VIEW"
         }
         require(actionViewIndex > 0) {
-            "Could not locate Qwen's chat response link handler."
+            "Could not locate Compose's URI handler."
         }
         val intentCreationIndex = (0 until actionViewIndex).lastOrNull { index ->
-            val instruction = responseLinkInstructions[index]
+            val instruction = composeUriInstructions[index]
             instruction.opcode == Opcode.NEW_INSTANCE &&
                 (instruction as? ReferenceInstruction)?.reference.toString() ==
                 "Landroid/content/Intent;"
-        } ?: error("Could not locate Qwen's chat response ACTION_VIEW intent.")
+        } ?: error("Could not locate Compose's ACTION_VIEW intent.")
 
-        responseLinkMethod.addInstructions(
+        composeUriMethod.addInstructions(
             intentCreationIndex,
             """
+                iget-object v0, p0, Landroidx/compose/ui/platform/AndroidUriHandler;->context:Landroid/content/Context;
                 invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
                 move-result-object p1
-                iget-object v0, p0, Lai/qwenlm/chat/android/clean/navigation/graph/m2;->a:Landroid/content/Context;
+                invoke-virtual { p1 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+                move-result-object v2
+                if-eqz v2, :compose_uri_other_scheme
+                const-string v3, "http"
+                invoke-virtual { v2, v3 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v3
+                const-string v1, "https"
+                invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v1
+                or-int/2addr v3, v1
+                if-eqz v3, :compose_uri_other_scheme
                 new-instance v1, $CUSTOM_TABS_BUILDER
                 invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
                 invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
                 move-result-object v1
                 invoke-virtual { v1, v0, p1 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
-                sget-object v0, Lkotlin/Unit;->INSTANCE:Lkotlin/Unit;
-                return-object v0
+                return-void
+                :compose_uri_other_scheme
+                new-instance v1, Landroid/content/Intent;
+                const-string v3, "android.intent.action.VIEW"
+                invoke-direct { v1, v3, p1 }, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
+                invoke-virtual { v0, v1 }, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
+                return-void
             """
         )
     }
