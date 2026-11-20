@@ -50,7 +50,15 @@ val qwenCustomTabsPatch = patch(
         }
 
         val returnRegister = (instructions[returnIndex] as OneRegisterInstruction).registerA
-        val registers = method.getFreeRegisterProvider(returnIndex, 3)
+        val implementation = method.implementation!!
+        val parameterStart = implementation.registerCount - method.parameterTypes.size - 1
+        val registers = method.getFreeRegisterProvider(
+            returnIndex,
+            3,
+            parameterStart,
+            parameterStart + 1,
+            parameterStart + 2
+        )
         val freeContext = registers.getFreeRegister4Bit()
         val freeUri = registers.getFreeRegister4Bit()
         val freeTabs = registers.getFreeRegister4Bit()
