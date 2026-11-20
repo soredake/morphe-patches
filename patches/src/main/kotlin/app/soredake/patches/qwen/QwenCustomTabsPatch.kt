@@ -5,8 +5,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.patch
 import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
 import com.android.tools.smali.dexlib2.Opcode
-import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 private const val CUSTOM_TABS_INTENT = "Landroidx/browser/customtabs/CustomTabsIntent;"
@@ -39,21 +39,21 @@ val qwenCustomTabsPatch = patch(
         }
         require(downloadCheck >= 0) { "Could not locate Qwen's download navigation check." }
 
-        // The ordinary WebView path reaches a shared return-false instruction
-        // through a label/goto, so the false constant is not adjacent to RETURN.
-        val returnIndex = instructions.indexOfLast { instruction ->
-            instruction.opcode == Opcode.RETURN && instruction is OneRegisterInstruction
+        // Hook before Qwen loads navigationUrlTransformer. Later in the method
+        // it reuses p2 for a Boolean result, so p2 is no longer a request there.
+        val transformerLoadIndex = instructions.indexOfLast { instruction ->
+            instruction.opcode == Opcode.IGET_OBJECT &&
+                ((instruction as? ReferenceInstruction)?.reference as? FieldReference)?.name ==
+                "navigationUrlTransformer"
         }
-        require(returnIndex > downloadCheck) {
-            "Could not locate the normal WebView return-false path."
+        require(transformerLoadIndex > downloadCheck) {
+            "Could not locate Qwen's navigation URL transformer."
         }
 
-        val returnRegister = (instructions[returnIndex] as OneRegisterInstruction).registerA
         val implementation = method.implementation!!
         // Qwen 2.5.1 has ten local registers (v0-v9) and three incoming
-        // registers (p0-p2 = v10-v12). Use dedicated locals rather than the
-        // free-register allocator, which can mistake incoming parameters as
-        // dead after their original last use.
+        // registers (p0-p2 = v10-v12). These local registers are no longer
+        // needed after the transformer load.
         require(implementation.registerCount >= 13) {
             "Unexpected register layout in Qwen's WebView navigation method."
         }
@@ -63,11 +63,8 @@ val qwenCustomTabsPatch = patch(
         val freeTabs = 8
 
         method.addInstructions(
-            returnIndex,
+            transformerLoadIndex,
             """
-                invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
-                move-result v$freeGesture
-                if-eqz v$freeGesture, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
                 move-result v$freeGesture
                 if-eqz v$freeGesture, :qwen_custom_tabs_continue
@@ -80,7 +77,8 @@ val qwenCustomTabsPatch = patch(
                 invoke-virtual { v$freeTabs }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
                 move-result-object v$freeTabs
                 invoke-virtual { v$freeTabs, v$freeContext, v$freeUri }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
-                const/4 v$returnRegister, 0x1
+                const/4 v$freeGesture, 0x1
+                return v$freeGesture
                 :qwen_custom_tabs_continue
             """
         )
