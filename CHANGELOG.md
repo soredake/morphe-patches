@@ -1,3 +1,9 @@
+## [1.0.0-dev.4](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* only open tapped Qwen links in custom tabs ([d05dbed](https://github.com/soredake/morphe-patches/commit/d05dbed18a5fdd22d092e2144a849a070044060a))
+
 ## [1.0.0-dev.3](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-11-20)
 
 ### 🐛 Bug Fixes
