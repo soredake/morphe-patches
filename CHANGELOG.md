@@ -1,3 +1,9 @@
+## [1.0.0-dev.6](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* exclude Qwen receiver and argument registers ([d66c57e](https://github.com/soredake/morphe-patches/commit/d66c57e777c5e90c83aca8f6e0cadd3f972477ae))
+
 ## [1.0.0-dev.5](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-11-20)
 
 ### 🐛 Bug Fixes
