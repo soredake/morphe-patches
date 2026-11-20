@@ -6,7 +6,6 @@ import app.morphe.patcher.patch.patch
 import app.morphe.patcher.util.getFreeRegisterProvider
 import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
 import com.android.tools.smali.dexlib2.Opcode
-import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
@@ -41,26 +40,27 @@ val qwenCustomTabsPatch = patch(
         }
         require(downloadCheck >= 0) { "Could not locate Qwen's download navigation check." }
 
-        // Locate the false return after download/OAuth handling; earlier returns
-        // implement those existing interceptions and must remain untouched.
-        val falseConstantIndex = (downloadCheck + 1 until instructions.size - 1).firstOrNull { index ->
-            val constant = instructions[index]
-            val returned = instructions[index + 1]
-            constant.opcode == Opcode.CONST_4 &&
-                constant is NarrowLiteralInstruction && constant.narrowLiteral == 0 &&
-                constant is OneRegisterInstruction && returned.opcode == Opcode.RETURN &&
-                returned is OneRegisterInstruction && constant.registerA == returned.registerA
-        } ?: error("Could not locate the normal WebView return-false path.")
+        // The ordinary WebView path reaches a shared return-false instruction
+        // through a label/goto, so the false constant is not adjacent to RETURN.
+        val returnIndex = instructions.indexOfLast { instruction ->
+            instruction.opcode == Opcode.RETURN && instruction is OneRegisterInstruction
+        }
+        require(returnIndex > downloadCheck) {
+            "Could not locate the normal WebView return-false path."
+        }
 
-        val returnRegister = (instructions[falseConstantIndex] as OneRegisterInstruction).registerA
-        val registers = method.getFreeRegisterProvider(falseConstantIndex, 3)
+        val returnRegister = (instructions[returnIndex] as OneRegisterInstruction).registerA
+        val registers = method.getFreeRegisterProvider(returnIndex, 3)
         val freeContext = registers.getFreeRegister4Bit()
         val freeUri = registers.getFreeRegister4Bit()
         val freeTabs = registers.getFreeRegister4Bit()
 
         method.addInstructions(
-            falseConstantIndex,
+            returnIndex,
             """
+                invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
+                move-result v$freeContext
+                if-eqz v$freeContext, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
                 move-result-object v$freeUri
                 invoke-virtual { p1 }, Landroid/view/View;->getContext()Landroid/content/Context;
@@ -71,7 +71,7 @@ val qwenCustomTabsPatch = patch(
                 move-result-object v$freeTabs
                 invoke-virtual { v$freeTabs, v$freeContext, v$freeUri }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
                 const/4 v$returnRegister, 0x1
-                return v$returnRegister
+                :qwen_custom_tabs_continue
             """
         )
     }
