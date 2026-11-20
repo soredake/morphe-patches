@@ -1,6 +1,7 @@
 package app.soredake.patches.qwen
 
 import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.util.getFreeRegisterProvider
@@ -54,7 +55,8 @@ val qwenCustomTabsPatch = patch(
         val freeUri = registers.getFreeRegister4Bit()
         val freeTabs = registers.getFreeRegister4Bit()
 
-        method.replaceInstruction(falseConstantIndex, "const/4 v$returnRegister, 0x1")
+        method.removeInstruction(falseConstantIndex)
+        method.addInstruction(falseConstantIndex, "const/4 v$returnRegister, 0x1")
         method.addInstructions(
             falseConstantIndex,
             """
