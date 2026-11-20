@@ -1,14 +1,13 @@
-group = "app.template"
+group = "app.soredake"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
-        contact = "na"
-        website = "na"
+        name = "Qwen Custom Tabs"
+        description = "Opens Qwen links in Android Custom Tabs"
+        source = "https://github.com/soredake/morphe-patches"
+        author = "soredake"
+        contact = "https://github.com/soredake/morphe-patches/issues"
+        website = "https://morphe.software/faq"
         license = "GPLv3"
     }
 }
