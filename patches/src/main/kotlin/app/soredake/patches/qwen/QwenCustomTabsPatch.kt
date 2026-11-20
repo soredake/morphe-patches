@@ -3,7 +3,6 @@ package app.soredake.patches.qwen
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.patch
-import app.morphe.patcher.util.getFreeRegisterProvider
 import app.soredake.patches.shared.Constants.COMPATIBILITY_QWEN
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
@@ -51,29 +50,27 @@ val qwenCustomTabsPatch = patch(
 
         val returnRegister = (instructions[returnIndex] as OneRegisterInstruction).registerA
         val implementation = method.implementation!!
-        // This is an instance method with p0=this, p1=WebView, and p2=request.
-        // Exclude the three physical incoming registers from temporary allocation.
-        val parameterStart = implementation.registerCount - 3
-        val registers = method.getFreeRegisterProvider(
-            returnIndex,
-            3,
-            parameterStart,
-            parameterStart + 1,
-            parameterStart + 2
-        )
-        val freeContext = registers.getFreeRegister4Bit()
-        val freeUri = registers.getFreeRegister4Bit()
-        val freeTabs = registers.getFreeRegister4Bit()
+        // Qwen 2.5.1 has ten local registers (v0-v9) and three incoming
+        // registers (p0-p2 = v10-v12). Use dedicated locals rather than the
+        // free-register allocator, which can mistake incoming parameters as
+        // dead after their original last use.
+        require(implementation.registerCount >= 13) {
+            "Unexpected register layout in Qwen's WebView navigation method."
+        }
+        val freeGesture = 5
+        val freeUri = 6
+        val freeContext = 7
+        val freeTabs = 8
 
         method.addInstructions(
             returnIndex,
             """
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
-                move-result v$freeContext
-                if-eqz v$freeContext, :qwen_custom_tabs_continue
+                move-result v$freeGesture
+                if-eqz v$freeGesture, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->hasGesture()Z
-                move-result v$freeContext
-                if-eqz v$freeContext, :qwen_custom_tabs_continue
+                move-result v$freeGesture
+                if-eqz v$freeGesture, :qwen_custom_tabs_continue
                 invoke-interface { p2 }, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
                 move-result-object v$freeUri
                 invoke-virtual { p1 }, Landroid/view/View;->getContext()Landroid/content/Context;
