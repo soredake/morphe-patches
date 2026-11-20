@@ -13,6 +13,8 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 private const val CUSTOM_TABS_INTENT = "Landroidx/browser/customtabs/CustomTabsIntent;"
 private const val CUSTOM_TABS_BUILDER = "Landroidx/browser/customtabs/CustomTabsIntent\$Builder;"
+private const val QWEN_POPUP_HANDLER = "Lai/qwenlm/chat/android/ui/web/WebScreenKt\$openPopupInComposeWeb\$1;"
+private const val QWEN_POPUP_CONTEXT_FIELD = "\$context"
 
 private object QwenWebNavigationFingerprint : Fingerprint(
     definingClass = "Lai/qwenlm/chat/android/browser/QwenChatWebViewClient;",
@@ -157,7 +159,7 @@ val qwenCustomTabsPatch = patch(
                 if-eqz v3, :qwen_popup_continue
                 invoke-static { p2 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
                 move-result-object v0
-                iget-object v2, p0, Lai/qwenlm/chat/android/ui/web/WebScreenKt${'$'}openPopupInComposeWeb${'$'}1;->${'$'}context:Landroid/content/Context;
+                iget-object v2, p0, $QWEN_POPUP_HANDLER->$QWEN_POPUP_CONTEXT_FIELD:Landroid/content/Context;
                 new-instance v3, $CUSTOM_TABS_BUILDER
                 invoke-direct { v3 }, $CUSTOM_TABS_BUILDER-><init>()V
                 invoke-virtual { v3 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
