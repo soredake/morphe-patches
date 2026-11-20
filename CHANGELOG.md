@@ -1,3 +1,11 @@
+## [1.0.0-dev.13](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* escape popup handler smali symbols ([987a717](https://github.com/soredake/morphe-patches/commit/987a71743d68026e68644fd9e76dafd7b003dbeb))
+* interpolate Qwen popup descriptors safely ([9b4c18e](https://github.com/soredake/morphe-patches/commit/9b4c18e7a97a1332cf3c71b2913211cd5e0e4d3c))
+* route Qwen popup links to custom tabs ([e8d1f96](https://github.com/soredake/morphe-patches/commit/e8d1f9681c5892edf843751d077ccdd47b815e06))
+
 ## [1.0.0-dev.12](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.11...v1.0.0-dev.12) (2026-11-20)
 
 ### 🐛 Bug Fixes
