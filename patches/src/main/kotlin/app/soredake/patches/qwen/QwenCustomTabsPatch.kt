@@ -1,6 +1,7 @@
 package app.soredake.patches.qwen
 
 import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.util.smali.ExternalLabel
@@ -38,6 +39,14 @@ private object QwenWebViewActivityFingerprint : Fingerprint(
     returnType = "V",
     parameters = listOf("Landroid/os/Bundle;"),
     strings = listOf("targetUrl")
+)
+
+private object QwenChatResponseLinkFingerprint : Fingerprint(
+    definingClass = "Lai/qwenlm/chat/android/clean/navigation/graph/m2;",
+    name = "invoke",
+    returnType = "Ljava/lang/Object;",
+    parameters = listOf("Ljava/lang/Object;"),
+    strings = listOf("android.intent.action.VIEW")
 )
 
 @Suppress("unused")
@@ -228,6 +237,42 @@ val qwenCustomTabsPatch = patch(
                 return-void
             """,
             ExternalLabel("qwen_activity_continue", activityInstructions[activityContinuationIndex])
+        )
+
+        // Chat response links use this callback to send ACTION_VIEW intents,
+        // which Qwen resolves to its own in-app browser.
+        val responseLinkMethod = QwenChatResponseLinkFingerprint.method
+        val responseLinkInstructions = responseLinkMethod.implementation!!.instructions
+        val actionViewIndex = responseLinkInstructions.indexOfFirst { instruction ->
+            (instruction.opcode == Opcode.CONST_STRING ||
+                instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
+                ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string ==
+                "android.intent.action.VIEW"
+        }
+        require(actionViewIndex > 0) {
+            "Could not locate Qwen's chat response link handler."
+        }
+        val intentCreationIndex = (0 until actionViewIndex).lastOrNull { index ->
+            val instruction = responseLinkInstructions[index]
+            instruction.opcode == Opcode.NEW_INSTANCE &&
+                (instruction as? ReferenceInstruction)?.reference.toString() ==
+                "Landroid/content/Intent;"
+        } ?: error("Could not locate Qwen's chat response ACTION_VIEW intent.")
+
+        responseLinkMethod.addInstructions(
+            intentCreationIndex,
+            """
+                invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+                move-result-object p1
+                iget-object v0, p0, Lai/qwenlm/chat/android/clean/navigation/graph/m2;->a:Landroid/content/Context;
+                new-instance v1, $CUSTOM_TABS_BUILDER
+                invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
+                invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
+                move-result-object v1
+                invoke-virtual { v1, v0, p1 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                sget-object v0, Lkotlin/Unit;->INSTANCE:Lkotlin/Unit;
+                return-object v0
+            """
         )
     }
 }
