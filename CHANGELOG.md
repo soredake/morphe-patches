@@ -1,3 +1,9 @@
+## [1.0.0-dev.14](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* intercept Qwen web activity URLs ([6e48e8f](https://github.com/soredake/morphe-patches/commit/6e48e8f82533682882e64742fda76baa83ef9b6f))
+
 ## [1.0.0-dev.13](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2026-11-20)
 
 ### 🐛 Bug Fixes
