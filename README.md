@@ -1,40 +1,27 @@
-# 👋🧩 Morphe Patches template
+# Qwen Custom Tabs patches
 
-Template repository for Morphe Patches.
+Morphe patches for Qwen (`com.tongyi.intl`). The current patch opens HTTP(S) links from Qwen's embedded browser in Android Custom Tabs and targets Qwen 2.5.1.
 
-## ❓ About
+## Install
 
-Patches for apps I like.
+Add this manifest URL as a patch source in Morphe Manager to use the development release channel. Enable prereleases for the source:
 
-<!-- TODO: Update this about section with a brief introduction/summary about this repo and what it offers. -->
+`https://raw.githubusercontent.com/soredake/morphe-patches/dev/patches-bundle.json`
 
-### How to use these patches
-
-Click the button below, or manually add this repo url to Morphe Manager: https://github.com/xyz-user/xyz-patches
-
-<a href="https://morphe.software/add-source?github=xyz-user/xyz-patches">
-  <img src=".github/assets/add-to-morphe.svg" alt="Add to Morphe" height="48">
-</a>
-
-## 🩹 Patches list
+## Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.1](https://github.com/soredake/morphe-patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`dev`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**1 patches** across **1 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.0.0-dev.1](https://github.com/soredake/morphe-patches/releases/tag/v1.0.0-dev.1)** · `dev` · **1 patch** across **1 app**
 
-| # | App | Patches | Version | Package |
-|---|---|---|---|---|
-| 1 | [**Qwen**](PATCHES.md#qwen-comtongyiintl) | 1 | `2.5.1` | [`com.tongyi.intl`](https://play.google.com/store/apps/details?id=com.tongyi.intl) |
+| App | Patch | Qwen version |
+|---|---|---|
+| Qwen | Open links in Custom Tabs | `2.5.1` |
 <!-- PATCHES_END -->
 
-### 🛠️ Building locally
+## Build locally
 
-- Run `./gradlew buildAndroid`
-- The built patches .mpp file is found in `patches/build/libs/patches-*.mpp`
-- Patch the mpp file using [Morphe-Desktop](https://github.com/MorpheApp/morphe-desktop)
-  like any other patch bundle.
+Run `./gradlew buildAndroid`. The `.mpp` bundle is written to `patches/build/libs/` and can be applied with [Morphe Desktop](https://github.com/MorpheApp/morphe-desktop).
 
-See the [Morphe documentation](https://github.com/MorpheApp/morphe-documentation) for more information.
+## License
 
-## 📜 License
-
-UserXYZ Patches are licensed under the [GNU General Public License v3.0](LICENSE)
+Licensed under the [GNU General Public License v3.0](LICENSE).
