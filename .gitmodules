@@ -1,0 +1,3 @@
+[submodule "patches/UniPatches"]
+	path = patches/UniPatches
+	url = https://github.com/Zanuaimi/UniPatches.git

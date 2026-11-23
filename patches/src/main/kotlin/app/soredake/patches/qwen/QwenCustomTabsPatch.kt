@@ -239,44 +239,43 @@ val qwenCustomTabsPatch = patch(
             ExternalLabel("qwen_activity_continue", activityInstructions[activityContinuationIndex])
         )
 
-        // Hook AFTER URI is parsed by original code (v3 = Uri)
-        // This avoids register conflicts and duplicate parsing
-        val composeUriMethod = ComposeUriHandlerFingerprint.method
-        val composeUriInstructions = composeUriMethod.implementation!!.instructions
-        val parseResultIndex = composeUriInstructions.indexOfFirst { instruction ->
-            instruction.opcode == Opcode.MOVE_RESULT_OBJECT &&
-            composeUriInstructions.indexOfFirst { it.opcode == Opcode.INVOKE_STATIC &&
-                (it as? ReferenceInstruction)?.reference?.toString() == "Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;" } < composeUriInstructions.indexOf(instruction)
-        }
-        require(parseResultIndex >= 0) { "Could not locate URI parse result." }
-        val continueIndex = parseResultIndex + 1
-        require(continueIndex < composeUriInstructions.size) { "Could not locate continuation after URI parse." }
-
-        // v0 = context, v3 = parsed Uri (from original code)
-        composeUriMethod.addInstructionsWithLabels(
-            continueIndex,
-            """
-                invoke-virtual { v3 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
-                move-result-object v2
-                if-eqz v2, :compose_uri_continue
-                const-string v1, "https"
-                invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v1
-                if-nez v1, :compose_uri_custom_tabs
-                const-string v1, "http"
-                invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v1
-                if-eqz v1, :compose_uri_continue
-                :compose_uri_custom_tabs
-                new-instance v1, $CUSTOM_TABS_BUILDER
-                invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
-                invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
-                move-result-object v1
-                invoke-virtual { v1, v0, v3 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
-                return-void
-                :compose_uri_continue
-            """,
-            ExternalLabel("compose_uri_continue", composeUriInstructions[continueIndex])
-        )
+        // AndroidUriHandler patch disabled - class in secondary DEX (classes4.dex)
+        // causes "classDef is null" error. Other patches handle main navigation paths.
+        // val composeUriMethod = ComposeUriHandlerFingerprint.method
+        // val composeUriInstructions = composeUriMethod.implementation!!.instructions
+        // val parseResultIndex = composeUriInstructions.indexOfFirst { instruction ->
+        //     instruction.opcode == Opcode.MOVE_RESULT_OBJECT &&
+        //     composeUriInstructions.indexOfFirst { it.opcode == Opcode.INVOKE_STATIC &&
+        //         (it as? ReferenceInstruction)?.reference?.toString() == "Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;" } < composeUriInstructions.indexOf(instruction)
+        // }
+        // require(parseResultIndex >= 0) { "Could not locate URI parse result." }
+        // val continueIndex = parseResultIndex + 1
+        // require(continueIndex < composeUriInstructions.size) { "Could not locate continuation after URI parse." }
+        //
+        // composeUriMethod.addInstructionsWithLabels(
+        //     continueIndex,
+        //     """
+        //         invoke-virtual { v3 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+        //         move-result-object v2
+        //         if-eqz v2, :compose_uri_continue
+        //         const-string v1, "https"
+        //         invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+        //         move-result v1
+        //         if-nez v1, :compose_uri_custom_tabs
+        //         const-string v1, "http"
+        //         invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+        //         move-result v1
+        //         if-eqz v1, :compose_uri_continue
+        //         :compose_uri_custom_tabs
+        //         new-instance v1, $CUSTOM_TABS_BUILDER
+        //         invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
+        //         invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
+        //         move-result-object v1
+        //         invoke-virtual { v1, v0, v3 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+        //         return-void
+        //         :compose_uri_continue
+        //     """,
+        //     ExternalLabel("compose_uri_continue", composeUriInstructions[continueIndex])
+        // )
     }
 }
