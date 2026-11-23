@@ -267,16 +267,16 @@ val qwenCustomTabsPatch = patch(
                 invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
                 move-result-object v3
                 invoke-virtual { v3 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
-                move-result-object v2
-                if-eqz v2, :compose_uri_other_scheme
-                const-string v1, "http"
-                invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v1
-                const-string v4, "https"
-                invoke-virtual { v2, v4 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v4
-                or-int/2addr v1, v4
+                move-result-object v1
                 if-eqz v1, :compose_uri_other_scheme
+                const-string v2, "https"
+                invoke-virtual { v1, v2 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v2
+                const-string v2, "http"
+                invoke-virtual { v1, v2 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v1
+                or-int/2addr v2, v1
+                if-eqz v2, :compose_uri_other_scheme
                 new-instance v1, $CUSTOM_TABS_BUILDER
                 invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
                 invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
