@@ -1,3 +1,9 @@
+## [1.0.0-dev.20](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* fully replace AndroidUriHandler logic with no merge conflicts ([a872227](https://github.com/soredake/morphe-patches/commit/a87222718e3e506bdc350367d6c681a75d1ab48c))
+
 ## [1.0.0-dev.19](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.18...v1.0.0-dev.19) (2026-11-23)
 
 ### 🐛 Bug Fixes
