@@ -1,3 +1,9 @@
+## [1.0.0-dev.27](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.26...v1.0.0-dev.27) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* adjust register count and usage for Markdown UriHandler (3 registers) ([689037e](https://github.com/soredake/morphe-patches/commit/689037ee27ddfb4d077244ffa6decb4a603a4d96))
+
 ## [1.0.0-dev.26](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.25...v1.0.0-dev.26) (2026-11-23)
 
 ### 🐛 Bug Fixes

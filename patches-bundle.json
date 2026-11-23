@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-23T15:38:50",
-  "description": "## [1.0.0-dev.26](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.25...v1.0.0-dev.26) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* intercept markdown link clicks in Custom Tabs ([9625641](https://github.com/soredake/morphe-patches/commit/96256415406e631b64303719226439245f680d2a))\n* use constants for Markdown UriHandler descriptor to avoid Kotlin interpolation ([58eb561](https://github.com/soredake/morphe-patches/commit/58eb561266eb692d794a6cc5a0788c6742c216e8))",
-  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.26/patches-1.0.0-dev.26.mpp",
+  "created_at": "2026-11-23T15:46:19",
+  "description": "## [1.0.0-dev.27](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.26...v1.0.0-dev.27) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* adjust register count and usage for Markdown UriHandler (3 registers) ([689037e](https://github.com/soredake/morphe-patches/commit/689037ee27ddfb4d077244ffa6decb4a603a4d96))",
+  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.27/patches-1.0.0-dev.27.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.26"
+  "version": "1.0.0-dev.27"
 }
