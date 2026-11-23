@@ -265,23 +265,23 @@ val qwenCustomTabsPatch = patch(
             """
                 iget-object v0, p0, Landroidx/compose/ui/platform/AndroidUriHandler;->context:Landroid/content/Context;
                 invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
-                move-result-object p1
-                invoke-virtual { p1 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+                move-result-object v3
+                invoke-virtual { v3 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
                 move-result-object v2
                 if-eqz v2, :compose_uri_other_scheme
-                const-string v3, "http"
-                invoke-virtual { v2, v3 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v3
-                const-string v1, "https"
+                const-string v1, "http"
                 invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
                 move-result v1
-                or-int/2addr v3, v1
-                if-eqz v3, :compose_uri_other_scheme
+                const-string v4, "https"
+                invoke-virtual { v2, v4 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v4
+                or-int/2addr v1, v4
+                if-eqz v1, :compose_uri_other_scheme
                 new-instance v1, $CUSTOM_TABS_BUILDER
                 invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
                 invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
                 move-result-object v1
-                invoke-virtual { v1, v0, p1 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                invoke-virtual { v1, v0, v3 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
                 return-void
             """,
             ExternalLabel("compose_uri_other_scheme", composeUriInstructions[actionViewIndex])
