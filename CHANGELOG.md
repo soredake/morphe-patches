@@ -1,3 +1,9 @@
+## [1.0.0-dev.19](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.18...v1.0.0-dev.19) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* use only v0-v3 locals for AndroidUriHandler to avoid p0/p1 corruption ([d71b3dc](https://github.com/soredake/morphe-patches/commit/d71b3dccd031704b24695232589f6574044f7b4f))
+
 ## [1.0.0-dev.18](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.17...v1.0.0-dev.18) (2026-11-23)
 
 ### 🐛 Bug Fixes
