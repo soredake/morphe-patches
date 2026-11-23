@@ -1,3 +1,9 @@
+## [1.0.0-dev.25](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.24...v1.0.0-dev.25) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* disable AndroidUriHandler patch (class in secondary DEX) ([6267a40](https://github.com/soredake/morphe-patches/commit/6267a40b500aeabd70686ceaa592fa0b101dbe7b))
+
 ## [1.0.0-dev.24](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.23...v1.0.0-dev.24) (2026-11-23)
 
 ### 🐛 Bug Fixes

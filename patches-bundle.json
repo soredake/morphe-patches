@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-23T12:38:52",
-  "description": "## [1.0.0-dev.24](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.23...v1.0.0-dev.24) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* add unique string to Fingerprint to locate AndroidUriHandler across DEX files ([3ff8dda](https://github.com/soredake/morphe-patches/commit/3ff8dda342cb1c65efc3c6f592b842a127d971b8))",
-  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.24/patches-1.0.0-dev.24.mpp",
+  "created_at": "2026-11-23T12:54:03",
+  "description": "## [1.0.0-dev.25](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.24...v1.0.0-dev.25) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* disable AndroidUriHandler patch (class in secondary DEX) ([6267a40](https://github.com/soredake/morphe-patches/commit/6267a40b500aeabd70686ceaa592fa0b101dbe7b))",
+  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.25/patches-1.0.0-dev.25.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.24"
+  "version": "1.0.0-dev.25"
 }
