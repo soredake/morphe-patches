@@ -239,36 +239,26 @@ val qwenCustomTabsPatch = patch(
             ExternalLabel("qwen_activity_continue", activityInstructions[activityContinuationIndex])
         )
 
-        // Compose text links use AndroidUriHandler, whose ACTION_VIEW intent
-        // resolves to Qwen's in-app browser. Route HTTP(S) through Custom Tabs;
-        // preserve normal ACTION_VIEW behavior for other URI schemes.
+        // Hook AFTER URI is parsed by original code (v3 = Uri)
+        // This avoids register conflicts and duplicate parsing
         val composeUriMethod = ComposeUriHandlerFingerprint.method
         val composeUriInstructions = composeUriMethod.implementation!!.instructions
-        val actionViewIndex = composeUriInstructions.indexOfFirst { instruction ->
-            (instruction.opcode == Opcode.CONST_STRING ||
-                instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
-                ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string ==
-                "android.intent.action.VIEW"
+        val parseResultIndex = composeUriInstructions.indexOfFirst { instruction ->
+            instruction.opcode == Opcode.MOVE_RESULT_OBJECT &&
+            composeUriInstructions.indexOfFirst { it.opcode == Opcode.INVOKE_STATIC &&
+                (it as? ReferenceInstruction)?.reference?.toString() == "Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;" } < composeUriInstructions.indexOf(instruction)
         }
-        require(actionViewIndex > 0) {
-            "Could not locate Compose's URI handler."
-        }
-        val intentCreationIndex = (0 until actionViewIndex).lastOrNull { index ->
-            val instruction = composeUriInstructions[index]
-            instruction.opcode == Opcode.NEW_INSTANCE &&
-                (instruction as? ReferenceInstruction)?.reference.toString() ==
-                "Landroid/content/Intent;"
-        } ?: error("Could not locate Compose's ACTION_VIEW intent.")
+        require(parseResultIndex >= 0) { "Could not locate URI parse result." }
+        val continueIndex = parseResultIndex + 1
+        require(continueIndex < composeUriInstructions.size) { "Could not locate continuation after URI parse." }
 
-        composeUriMethod.addInstructions(
-            intentCreationIndex,
+        // v0 = context, v3 = parsed Uri (from original code)
+        composeUriMethod.addInstructionsWithLabels(
+            continueIndex,
             """
-                iget-object v0, p0, Landroidx/compose/ui/platform/AndroidUriHandler;->context:Landroid/content/Context;
-                invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
-                move-result-object v3
                 invoke-virtual { v3 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
                 move-result-object v2
-                if-eqz v2, :compose_uri_fallback
+                if-eqz v2, :compose_uri_continue
                 const-string v1, "https"
                 invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
                 move-result v1
@@ -276,7 +266,7 @@ val qwenCustomTabsPatch = patch(
                 const-string v1, "http"
                 invoke-virtual { v2, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
                 move-result v1
-                if-eqz v1, :compose_uri_fallback
+                if-eqz v1, :compose_uri_continue
                 :compose_uri_custom_tabs
                 new-instance v1, $CUSTOM_TABS_BUILDER
                 invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
@@ -284,13 +274,9 @@ val qwenCustomTabsPatch = patch(
                 move-result-object v1
                 invoke-virtual { v1, v0, v3 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
                 return-void
-                :compose_uri_fallback
-                new-instance v1, Landroid/content/Intent;
-                const-string v2, "android.intent.action.VIEW"
-                invoke-direct { v1, v2, v3 }, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
-                invoke-virtual { v0, v1 }, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
-                return-void
-            """
+                :compose_uri_continue
+            """,
+            ExternalLabel("compose_uri_continue", composeUriInstructions[continueIndex])
         )
     }
 }
