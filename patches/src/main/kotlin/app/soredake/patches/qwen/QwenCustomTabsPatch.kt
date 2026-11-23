@@ -266,7 +266,8 @@ val qwenCustomTabsPatch = patch(
             markdownInstructions[index].opcode == Opcode.RETURN_VOID
         } ?: error("Could not locate Markdown UriHandler return.")
 
-        require(markdownMethod.implementation!!.registerCount >= 4) {
+        // Method has 3 registers (2 params + 1 local = p0, p1, v0)
+        require(markdownMethod.implementation!!.registerCount >= 3) {
             "Unexpected register layout in Markdown UriHandler."
         }
 
@@ -278,23 +279,21 @@ val qwenCustomTabsPatch = patch(
                 invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
                 move-result-object v2
                 invoke-virtual { v2 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
-                move-result-object v3
-                if-eqz v3, :markdown_uri_continue
-                const-string v4, "http"
-                invoke-virtual { v3, v4 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v4
-                const-string v4, "https"
-                invoke-virtual { v3, v4 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-                move-result v3
-                or-int/2addr v4, v3
-                if-eqz v4, :markdown_uri_continue
-                iget-object v3, p0, $MARKDOWN_URI_HANDLER_CLASS->$MARKDOWN_URI_HANDLER_CALLBACK_FIELD_DESC
-                if-eqz v3, :markdown_uri_continue
-                new-instance v4, $CUSTOM_TABS_BUILDER
-                invoke-direct { v4 }, $CUSTOM_TABS_BUILDER-><init>()V
-                invoke-virtual { v4 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
-                move-result-object v4
-                invoke-virtual { v4, p0, p1 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                move-result-object v0
+                if-eqz v0, :markdown_uri_continue
+                const-string v1, "http"
+                invoke-virtual { v0, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v1
+                const-string v1, "https"
+                invoke-virtual { v0, v1 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v1
+                or-int/2addr v2, v1
+                if-eqz v2, :markdown_uri_continue
+                new-instance v1, $CUSTOM_TABS_BUILDER
+                invoke-direct { v1 }, $CUSTOM_TABS_BUILDER-><init>()V
+                invoke-virtual { v1 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
+                move-result-object v1
+                invoke-virtual { v1, p0, p1 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
                 return-void
                 :markdown_uri_continue
             """,
