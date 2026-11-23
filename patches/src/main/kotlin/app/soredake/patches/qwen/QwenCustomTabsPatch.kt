@@ -260,7 +260,7 @@ val qwenCustomTabsPatch = patch(
                 "Landroid/content/Intent;"
         } ?: error("Could not locate Compose's ACTION_VIEW intent.")
 
-        composeUriMethod.addInstructionsWithLabels(
+        composeUriMethod.addInstructions(
             intentCreationIndex,
             """
                 iget-object v0, p0, Landroidx/compose/ui/platform/AndroidUriHandler;->context:Landroid/content/Context;
@@ -290,9 +290,7 @@ val qwenCustomTabsPatch = patch(
                 invoke-direct { v1, v2, v3 }, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
                 invoke-virtual { v0, v1 }, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
                 return-void
-            """,
-            ExternalLabel("compose_uri_fallback", composeUriInstructions[intentCreationIndex + 1]),
-            ExternalLabel("compose_uri_custom_tabs", composeUriInstructions[intentCreationIndex + 1])
+            """
         )
     }
 }
