@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-23T09:28:06",
-  "description": "## [1.0.0-dev.22](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.21...v1.0.0-dev.22) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* use addInstructions for AndroidUriHandler with internal labels only ([e4077a1](https://github.com/soredake/morphe-patches/commit/e4077a1e60adf0178078f72198aaba86365d6f19))",
-  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.22/patches-1.0.0-dev.22.mpp",
+  "created_at": "2026-11-23T12:16:03",
+  "description": "## [1.0.0-dev.23](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.22...v1.0.0-dev.23) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* hook after URI parse to avoid register conflicts and VerifyError ([55a9975](https://github.com/soredake/morphe-patches/commit/55a99754e5a35595fbfa183ac2155aedd28b7bfc))",
+  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.23/patches-1.0.0-dev.23.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.22"
+  "version": "1.0.0-dev.23"
 }

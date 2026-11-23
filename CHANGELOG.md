@@ -1,3 +1,9 @@
+## [1.0.0-dev.23](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.22...v1.0.0-dev.23) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* hook after URI parse to avoid register conflicts and VerifyError ([55a9975](https://github.com/soredake/morphe-patches/commit/55a99754e5a35595fbfa183ac2155aedd28b7bfc))
+
 ## [1.0.0-dev.22](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.21...v1.0.0-dev.22) (2026-11-23)
 
 ### 🐛 Bug Fixes
