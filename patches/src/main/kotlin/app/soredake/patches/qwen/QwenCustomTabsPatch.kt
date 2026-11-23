@@ -18,6 +18,8 @@ private const val QWEN_POPUP_HANDLER = "Lai/qwenlm/chat/android/ui/web/WebScreen
 private const val QWEN_POPUP_CONTEXT_FIELD = "\$context"
 private const val MARKDOWN_URI_HANDLER = "Lai/qwenlm/chat/android/clean/core/ui/markdown/MarkdownStyleKt\$c;"
 private const val MARKDOWN_URI_HANDLER_CALLBACK_FIELD = "a"
+private const val MARKDOWN_URI_HANDLER_CLASS = "Lai/qwenlm/chat/android/clean/core/ui/markdown/MarkdownStyleKt\$c;"
+private const val MARKDOWN_URI_HANDLER_CALLBACK_FIELD_DESC = "a:Lkotlin/jvm/functions/Function1;"
 
 private object QwenWebNavigationFingerprint : Fingerprint(
     definingClass = "Lai/qwenlm/chat/android/browser/QwenChatWebViewClient;",
@@ -286,7 +288,7 @@ val qwenCustomTabsPatch = patch(
                 move-result v3
                 or-int/2addr v4, v3
                 if-eqz v4, :markdown_uri_continue
-                iget-object v3, p0, Lai/qwenlm/chat/android/clean/core/ui/markdown/MarkdownStyleKt\$c;->a:Lkotlin/jvm/functions/Function1;
+                iget-object v3, p0, $MARKDOWN_URI_HANDLER_CLASS->$MARKDOWN_URI_HANDLER_CALLBACK_FIELD_DESC
                 if-eqz v3, :markdown_uri_continue
                 new-instance v4, $CUSTOM_TABS_BUILDER
                 invoke-direct { v4 }, $CUSTOM_TABS_BUILDER-><init>()V
