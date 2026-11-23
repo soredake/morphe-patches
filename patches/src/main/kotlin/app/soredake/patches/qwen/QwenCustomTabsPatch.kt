@@ -16,6 +16,8 @@ private const val CUSTOM_TABS_INTENT = "Landroidx/browser/customtabs/CustomTabsI
 private const val CUSTOM_TABS_BUILDER = "Landroidx/browser/customtabs/CustomTabsIntent\$Builder;"
 private const val QWEN_POPUP_HANDLER = "Lai/qwenlm/chat/android/ui/web/WebScreenKt\$openPopupInComposeWeb\$1;"
 private const val QWEN_POPUP_CONTEXT_FIELD = "\$context"
+private const val MARKDOWN_URI_HANDLER = "Lai/qwenlm/chat/android/clean/core/ui/markdown/MarkdownStyleKt\$c;"
+private const val MARKDOWN_URI_HANDLER_CALLBACK_FIELD = "a"
 
 private object QwenWebNavigationFingerprint : Fingerprint(
     definingClass = "Lai/qwenlm/chat/android/browser/QwenChatWebViewClient;",
@@ -39,6 +41,14 @@ private object QwenWebViewActivityFingerprint : Fingerprint(
     returnType = "V",
     parameters = listOf("Landroid/os/Bundle;"),
     strings = listOf("targetUrl")
+)
+
+private object MarkdownUriHandlerFingerprint : Fingerprint(
+    definingClass = "Lai/qwenlm/chat/android/clean/core/ui/markdown/MarkdownStyleKt\$c;",
+    name = "openUri",
+    returnType = "V",
+    parameters = listOf("Ljava/lang/String;"),
+    strings = listOf("uri")
 )
 
 private object ComposeUriHandlerFingerprint : Fingerprint(
@@ -237,6 +247,56 @@ val qwenCustomTabsPatch = patch(
                 return-void
             """,
             ExternalLabel("qwen_activity_continue", activityInstructions[activityContinuationIndex])
+        )
+
+        // Markdown link clicks use this UriHandler, which delegates to onUrlClick.
+        // Intercept HTTP/HTTPS URLs and open in Custom Tabs.
+        val markdownMethod = MarkdownUriHandlerFingerprint.method
+        val markdownInstructions = markdownMethod.implementation!!.instructions
+        val callbackFieldIndex = markdownInstructions.indexOfFirst { instruction ->
+            instruction.opcode == Opcode.IGET_OBJECT &&
+                ((instruction as? ReferenceInstruction)?.reference as? FieldReference)?.name == "a"
+        }
+        require(callbackFieldIndex >= 0) {
+            "Could not locate Markdown UriHandler callback field."
+        }
+        val returnIndex = (callbackFieldIndex until markdownInstructions.size).firstOrNull { index ->
+            markdownInstructions[index].opcode == Opcode.RETURN_VOID
+        } ?: error("Could not locate Markdown UriHandler return.")
+
+        require(markdownMethod.implementation!!.registerCount >= 4) {
+            "Unexpected register layout in Markdown UriHandler."
+        }
+
+        markdownMethod.addInstructionsWithLabels(
+            callbackFieldIndex,
+            """
+                iget-object v0, p0, $MARKDOWN_URI_HANDLER->$MARKDOWN_URI_HANDLER_CALLBACK_FIELD:Lkotlin/jvm/functions/Function1;
+                if-eqz v0, :markdown_uri_continue
+                invoke-static { p1 }, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+                move-result-object v2
+                invoke-virtual { v2 }, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+                move-result-object v3
+                if-eqz v3, :markdown_uri_continue
+                const-string v4, "http"
+                invoke-virtual { v3, v4 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v4
+                const-string v4, "https"
+                invoke-virtual { v3, v4 }, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+                move-result v3
+                or-int/2addr v4, v3
+                if-eqz v4, :markdown_uri_continue
+                iget-object v3, p0, Lai/qwenlm/chat/android/clean/core/ui/markdown/MarkdownStyleKt\$c;->a:Lkotlin/jvm/functions/Function1;
+                if-eqz v3, :markdown_uri_continue
+                new-instance v4, $CUSTOM_TABS_BUILDER
+                invoke-direct { v4 }, $CUSTOM_TABS_BUILDER-><init>()V
+                invoke-virtual { v4 }, $CUSTOM_TABS_BUILDER->build()$CUSTOM_TABS_INTENT
+                move-result-object v4
+                invoke-virtual { v4, p0, p1 }, $CUSTOM_TABS_INTENT->launchUrl(Landroid/content/Context;Landroid/net/Uri;)V
+                return-void
+                :markdown_uri_continue
+            """,
+            ExternalLabel("markdown_uri_continue", markdownInstructions[returnIndex])
         )
 
         // AndroidUriHandler patch disabled - class in secondary DEX (classes4.dex)
