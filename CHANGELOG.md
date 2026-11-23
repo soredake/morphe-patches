@@ -26,6 +26,13 @@
 * intercept markdown link clicks in Custom Tabs ([9625641](https://github.com/soredake/morphe-patches/commit/96256415406e631b64303719226439245f680d2a))
 * use constants for Markdown UriHandler descriptor to avoid Kotlin interpolation ([58eb561](https://github.com/soredake/morphe-patches/commit/58eb561266eb692d794a6cc5a0788c6742c216e8))
 
+## [1.0.0-dev.26](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.25...v1.0.0-dev.26) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* intercept markdown link clicks in Custom Tabs ([9625641](https://github.com/soredake/morphe-patches/commit/96256415406e631b64303719226439245f680d2a))
+* use constants for Markdown UriHandler descriptor to avoid Kotlin interpolation ([58eb561](https://github.com/soredake/morphe-patches/commit/58eb561266eb692d794a6cc5a0788c6742c216e8))
+
 ## [1.0.0-dev.25](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.24...v1.0.0-dev.25) (2026-11-23)
 
 ### 🐛 Bug Fixes
