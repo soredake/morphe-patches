@@ -1,3 +1,9 @@
+## [1.0.0-dev.24](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.23...v1.0.0-dev.24) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* add unique string to Fingerprint to locate AndroidUriHandler across DEX files ([3ff8dda](https://github.com/soredake/morphe-patches/commit/3ff8dda342cb1c65efc3c6f592b842a127d971b8))
+
 ## [1.0.0-dev.23](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.22...v1.0.0-dev.23) (2026-11-23)
 
 ### 🐛 Bug Fixes
