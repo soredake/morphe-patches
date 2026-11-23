@@ -1,3 +1,9 @@
+## [1.0.0-dev.18](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.17...v1.0.0-dev.18) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* preserve p1 register type for AndroidUriHandler fallback ([4d97924](https://github.com/soredake/morphe-patches/commit/4d97924dde68a47cf857d0dbb6c92b850d4b0837))
+
 ## [1.0.0-dev.17](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.16...v1.0.0-dev.17) (2026-11-23)
 
 ### 🐛 Bug Fixes
