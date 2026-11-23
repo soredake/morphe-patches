@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-23T09:16:10",
-  "description": "## [1.0.0-dev.20](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* fully replace AndroidUriHandler logic with no merge conflicts ([a872227](https://github.com/soredake/morphe-patches/commit/a87222718e3e506bdc350367d6c681a75d1ab48c))",
-  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.20/patches-1.0.0-dev.20.mpp",
+  "created_at": "2026-11-23T09:22:04",
+  "description": "## [1.0.0-dev.21](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.20...v1.0.0-dev.21) (2026-11-23)\n\n### 🐛 Bug Fixes\n\n* use addInstructionsWithLabels with ExternalLabel for all AndroidUriHandler branches ([8c66c15](https://github.com/soredake/morphe-patches/commit/8c66c15f0fd55455233b61a8f86b03ac386fbd29))",
+  "download_url": "https://github.com/soredake/morphe-patches/releases/download/v1.0.0-dev.21/patches-1.0.0-dev.21.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.20"
+  "version": "1.0.0-dev.21"
 }

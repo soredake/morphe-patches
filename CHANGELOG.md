@@ -1,3 +1,9 @@
+## [1.0.0-dev.21](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.20...v1.0.0-dev.21) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* use addInstructionsWithLabels with ExternalLabel for all AndroidUriHandler branches ([8c66c15](https://github.com/soredake/morphe-patches/commit/8c66c15f0fd55455233b61a8f86b03ac386fbd29))
+
 ## [1.0.0-dev.20](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2026-11-23)
 
 ### 🐛 Bug Fixes
