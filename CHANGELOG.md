@@ -1,3 +1,9 @@
+## [1.0.0-dev.17](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.16...v1.0.0-dev.17) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* use addInstructionsWithLabels for AndroidUriHandler to fix VerifyError ([b31c3cc](https://github.com/soredake/morphe-patches/commit/b31c3ccbd6505326c1f4c33d14b827aa42db3812))
+
 ## [1.0.0-dev.16](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.15...v1.0.0-dev.16) (2026-11-20)
 
 ### 🐛 Bug Fixes
