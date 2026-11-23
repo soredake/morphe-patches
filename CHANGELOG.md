@@ -1,3 +1,9 @@
+## [1.0.0-dev.22](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.21...v1.0.0-dev.22) (2026-11-23)
+
+### 🐛 Bug Fixes
+
+* use addInstructions for AndroidUriHandler with internal labels only ([e4077a1](https://github.com/soredake/morphe-patches/commit/e4077a1e60adf0178078f72198aaba86365d6f19))
+
 ## [1.0.0-dev.21](https://github.com/soredake/morphe-patches/compare/v1.0.0-dev.20...v1.0.0-dev.21) (2026-11-23)
 
 ### 🐛 Bug Fixes
