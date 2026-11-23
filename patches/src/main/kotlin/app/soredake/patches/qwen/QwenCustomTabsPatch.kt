@@ -46,7 +46,7 @@ private object ComposeUriHandlerFingerprint : Fingerprint(
     name = "openUri",
     returnType = "V",
     parameters = listOf("Ljava/lang/String;"),
-    strings = listOf("android.intent.action.VIEW")
+    strings = listOf("android.intent.action.VIEW", "Can\'t open ")
 )
 
 @Suppress("unused")
